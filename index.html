@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#12143A">
+<meta name="theme-color" content="#000000">
 <title>Consulta de preços · Livraria Big</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --tinta:#12143A;
-  --tinta-2:#1C1F55;
-  --tinta-3:#2A2E70;
-  --papel:#FFFDF6;
-  --marca:#FFD833;
-  --texto:#EDEBFF;
-  --texto-fraco:#A6A6D6;
-  --erro:#FF7A5C;
+  --tinta:#000000;
+  --tinta-2:#111111;
+  --tinta-3:#1C1C1C;
+  --papel:#FFFFFF;
+  --marca:#39FF14;
+  --texto:#FFFFFF;
+  --texto-fraco:#9A9A9A;
+  --erro:#FF5C4D;
   --display:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
   --corpo:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -39,9 +39,9 @@ body{
 .topo{
   display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
-  border-bottom:1px solid rgba(255,255,255,.10);
+  border-bottom:1px solid rgba(255,255,255,.16);
   position:sticky;top:0;z-index:5;
-  background:linear-gradient(var(--tinta) 78%,rgba(18,20,58,.86));
+  background:linear-gradient(var(--tinta) 78%,rgba(0,0,0,.86));
   backdrop-filter:blur(6px);
 }
 .marca{
@@ -58,7 +58,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   width:100%;font-size:17px;font-family:var(--corpo);
   padding:15px 44px 15px 16px;
   background:var(--tinta-2);color:var(--texto);
-  border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  border:1px solid rgba(255,255,255,.22);border-radius:14px;
 }
 .busca input::placeholder{color:var(--texto-fraco)}
 .busca input::-webkit-search-cancel-button,.busca input::-webkit-search-decoration{-webkit-appearance:none;display:none}
@@ -69,8 +69,57 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 }
 
 /* ---------- resultado ---------- */
+.chips{display:flex;gap:8px;margin:-4px 0 16px;flex-wrap:wrap}
+.chip{
+  background:var(--tinta-2);color:var(--texto);border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;padding:9px 15px;font-size:13.5px;font-family:var(--corpo);cursor:pointer;
+}
+.chip[aria-pressed="true"]{background:var(--marca);color:#000000;border-color:var(--marca);font-weight:600}
+
+.carrinho{
+  background:var(--tinta-2);border:1px solid rgba(57,255,20,.34);
+  border-radius:20px;padding:14px 16px 16px;margin-bottom:16px;
+}
+.carrinho-topo{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.mini{
+  background:none;border:1px solid rgba(255,255,255,.18);color:var(--texto-fraco);
+  border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:var(--corpo);
+}
+.itens.compacto button{padding:10px 2px;font-size:14px}
+.itens.compacto .t small{margin-top:2px}
+.soma{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding-top:12px;margin-top:6px;border-top:1px solid rgba(255,255,255,.12);
+}
+.soma span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--texto-fraco)}
+.soma strong{font-family:var(--display);font-weight:800;font-size:28px;color:var(--marca);letter-spacing:-.02em}
+.troco{display:flex;gap:10px;align-items:center;margin-top:12px}
+.troco input{
+  flex:1;min-width:0;background:var(--tinta);color:var(--texto);
+  border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px 14px;font-size:15px;
+  font-family:var(--corpo);
+}
+.troco input::placeholder{color:var(--texto-fraco)}
+#trocoValor{font-family:var(--display);font-weight:700;font-size:16px;white-space:nowrap;color:var(--texto-fraco)}
+#trocoValor.ok{color:var(--marca)}
+#trocoValor.falta{color:var(--erro)}
+
+.tira{
+  position:absolute;left:0;right:0;z-index:3;
+  bottom:calc(96px + env(safe-area-inset-bottom));
+  margin:0 14px;padding:12px 14px;border-radius:16px;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(8px);
+  border:1px solid rgba(57,255,20,.4);
+}
+.tira-item{font-size:14px;line-height:1.35;color:#fff}
+.tira-item b{color:var(--marca)}
+.tira-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;
+  padding-top:8px;border-top:1px solid rgba(255,255,255,.14)}
+.tira-total span{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--texto-fraco)}
+.tira-total strong{font-family:var(--display);font-weight:800;font-size:22px;color:var(--marca)}
+
 .cartao{
-  background:var(--tinta-2);border:1px solid rgba(255,255,255,.12);
+  background:var(--tinta-2);border:1px solid rgba(255,255,255,.16);
   border-radius:20px;padding:20px 18px 18px;margin-bottom:16px;
   animation:sobe .22s ease-out both;
 }
@@ -89,10 +138,10 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 /* etiqueta de preço — o elemento-assinatura */
 .etiqueta{
   margin:18px auto 4px;width:fit-content;
-  background:var(--marca);color:#141326;
+  background:var(--marca);color:#000000;
   border-radius:14px;padding:14px 26px 16px;
   transform:rotate(-1.8deg);
-  box-shadow:0 10px 0 -4px rgba(0,0,0,.35),0 18px 32px rgba(0,0,0,.38);
+  box-shadow:0 0 0 1px rgba(57,255,20,.5),0 14px 40px rgba(57,255,20,.22);
   text-align:center;
 }
 .etiqueta .rotulo{
@@ -108,10 +157,10 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 .etiqueta .centavos{font-size:.5em}
 
 .feira{display:inline-flex;align-items:center;gap:8px;margin-top:12px;
-  background:rgba(255,216,51,.13);border:1px solid rgba(255,216,51,.35);
+  background:rgba(57,255,20,.12);border:1px solid rgba(57,255,20,.4);
   color:var(--marca);border-radius:999px;padding:7px 14px 7px 10px;font-size:13.5px}
 .feira .qtd{font-family:var(--display);font-weight:800;font-size:16px;
-  background:var(--marca);color:#141326;border-radius:999px;padding:1px 9px}
+  background:var(--marca);color:#000000;border-radius:999px;padding:1px 9px}
 .feira.nao{background:none;border-color:rgba(255,255,255,.16);color:var(--texto-fraco)}
 .tabela{text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--texto-fraco);margin-top:14px;letter-spacing:.02em}
 .cartao.vazio{border-style:dashed;text-align:center;color:var(--texto-fraco);padding:30px 22px}
@@ -124,7 +173,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   color:var(--texto-fraco);margin:22px 2px 10px;
 }
 .itens{list-style:none;margin:0;padding:0}
-.itens li{border-bottom:1px solid rgba(255,255,255,.08)}
+.itens li{border-bottom:1px solid rgba(255,255,255,.13)}
 .itens button{
   width:100%;display:flex;gap:14px;align-items:center;justify-content:space-between;
   background:none;border:0;color:inherit;text-align:left;
@@ -142,13 +191,13 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 .barra{
   position:fixed;left:0;right:0;bottom:0;z-index:6;
   padding:12px 18px calc(12px + env(safe-area-inset-bottom));
-  background:linear-gradient(rgba(18,20,58,0),var(--tinta) 38%);
+  background:linear-gradient(rgba(0,0,0,0),var(--tinta) 38%);
 }
 .scan{
   width:100%;max-width:584px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:12px;
-  background:var(--marca);color:#141326;border:0;border-radius:16px;
+  background:var(--marca);color:#000000;border:0;border-radius:16px;
   font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.01em;
-  padding:18px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  padding:18px;cursor:pointer;box-shadow:0 8px 30px rgba(57,255,20,.28);
 }
 .scan:active{transform:translateY(1px)}
 .scan svg{width:24px;height:24px}
@@ -169,7 +218,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 .mira .janela::after{bottom:-2px;border-top:0;border-radius:0 0 16px 16px}
 .linha{
   position:absolute;left:8px;right:8px;height:3px;background:var(--marca);
-  border-radius:3px;box-shadow:0 0 14px rgba(255,216,51,.9);
+  border-radius:3px;box-shadow:0 0 14px rgba(57,255,20,.85);
   animation:varre 2.1s ease-in-out infinite;
 }
 @keyframes varre{0%,100%{top:12%}50%{top:86%}}
@@ -188,7 +237,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 }
 .btn-fechar{background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(8px)}
 .btn-lanterna{background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(8px)}
-.btn-lanterna[aria-pressed="true"]{background:var(--marca);color:#141326}
+.btn-lanterna[aria-pressed="true"]{background:var(--marca);color:#000000}
 .falha{
   position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
   padding:32px 26px;background:var(--tinta);gap:12px;z-index:3;
@@ -198,7 +247,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 
 .rodape{
   max-width:620px;margin:26px auto 0;padding:16px 18px 24px;
-  border-top:1px solid rgba(255,255,255,.08);
+  border-top:1px solid rgba(255,255,255,.13);
   font-size:12.5px;color:var(--texto-fraco);line-height:1.6;font-family:var(--mono);
 }
 @media (prefers-reduced-motion:reduce){
@@ -219,6 +268,27 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
            spellcheck="false" placeholder="Buscar por título ou código">
     <button class="limpar" id="limpar" hidden aria-label="Limpar busca">&times;</button>
   </div>
+
+  <div class="chips">
+    <button class="chip" id="chipFeira" aria-pressed="true">Só o que está na feira</button>
+    <button class="chip" id="chipBalcao" aria-pressed="false">Modo balcão</button>
+  </div>
+
+  <section class="carrinho" id="carrinho" hidden>
+    <div class="carrinho-topo">
+      <div class="secao-rotulo" style="margin:0">Balcão</div>
+      <button class="mini" id="btnLimparCarrinho">Limpar</button>
+    </div>
+    <ul class="itens compacto" id="itensCarrinho"></ul>
+    <div class="soma">
+      <span>Total</span>
+      <strong id="somaTotal">R$ 0,00</strong>
+    </div>
+    <div class="troco">
+      <input id="recebido" type="text" inputmode="decimal" placeholder="Valor recebido">
+      <div id="trocoValor">—</div>
+    </div>
+  </section>
 
   <div id="resultado"></div>
 
@@ -253,6 +323,10 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   <video id="video" playsinline muted autoplay></video>
   <div class="mira"><div class="janela"><div class="linha"></div></div></div>
   <p class="dica" id="dica">Encaixe o código de barras na janela</p>
+  <div class="tira" id="tira" hidden>
+    <div class="tira-item" id="tiraItem"></div>
+    <div class="tira-total"><span>Total</span><strong id="tiraTotal">R$ 0,00</strong></div>
+  </div>
   <div class="controles">
     <button class="btn-lanterna" id="btnZoom" hidden>Zoom 1x</button>
     <button class="btn-lanterna" id="btnLanterna" aria-pressed="false" hidden>Lanterna</button>
@@ -261,7 +335,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   <div class="falha" id="falha" hidden>
     <h2 id="falha-titulo">A câmera não abriu</h2>
     <p id="falha-texto"></p>
-    <button class="btn-fechar" id="btnFalhaFechar" style="margin-top:10px;padding:16px;border-radius:14px;border:0;font-family:var(--display);font-weight:700;font-size:16px;background:var(--marca);color:#141326">Digitar o código</button>
+    <button class="btn-fechar" id="btnFalhaFechar" style="margin-top:10px;padding:16px;border-radius:14px;border:0;font-family:var(--display);font-weight:700;font-size:16px;background:var(--marca);color:#000000">Digitar o código</button>
   </div>
 </div>
 
@@ -291,10 +365,25 @@ var elQ=document.getElementById('q'), elLimpar=document.getElementById('limpar')
     elDica=document.getElementById('dica'), elFalha=document.getElementById('falha'),
     elFalhaTexto=document.getElementById('falha-texto'), elFalhaTitulo=document.getElementById('falha-titulo'),
     elLanterna=document.getElementById('btnLanterna'),
-    elZoom=document.getElementById('btnZoom');
+    elZoom=document.getElementById('btnZoom'),
+    elChipFeira=document.getElementById('chipFeira'), elChipBalcao=document.getElementById('chipBalcao'),
+    elCarrinho=document.getElementById('carrinho'), elItensCarrinho=document.getElementById('itensCarrinho'),
+    elSomaTotal=document.getElementById('somaTotal'), elRecebido=document.getElementById('recebido'),
+    elTroco=document.getElementById('trocoValor'), elTira=document.getElementById('tira'),
+    elTiraItem=document.getElementById('tiraItem'), elTiraTotal=document.getElementById('tiraTotal');
 
+var naFeira = 0;
+for(var k=0;k<LIVROS.length;k++){ if(LIVROS[k][Q]>0) naFeira++; }
 document.getElementById('total').textContent =
-  LIVROS.length.toLocaleString('pt-BR') + ' títulos na listagem';
+  naFeira.toLocaleString('pt-BR') + ' títulos na feira · ' +
+  LIVROS.length.toLocaleString('pt-BR') + ' na listagem';
+
+/* ---------- preferências simples ---------- */
+function guardar(chave,valor){ try{ localStorage.setItem(chave,valor); }catch(e){} }
+function lembrar(chave){ try{ return localStorage.getItem(chave); }catch(e){ return null; } }
+
+var soFeira = lembrar('soFeira') !== '0';
+var balcao  = lembrar('balcao') === '1';
 
 /* ---------- formatação ---------- */
 function moeda(v){
@@ -322,14 +411,18 @@ function buscarCodigo(bruto){
 }
 
 /* ---------- busca por título ---------- */
+var ocultos = 0;
 function buscarTexto(termo){
   var alvo = semAcento(termo).trim();
   if(alvo.length<2) return [];
   var partes = alvo.split(/\s+/), achados=[];
+  ocultos = 0;
   for(var i=0;i<indice.length && achados.length<400;i++){
     var txt=indice[i], ok=true;
     for(var j=0;j<partes.length;j++){ if(txt.indexOf(partes[j])===-1){ok=false;break;} }
-    if(ok) achados.push(i);
+    if(!ok) continue;
+    if(soFeira && LIVROS[i][Q]<=0){ ocultos++; continue; }
+    achados.push(i);
   }
   achados.sort(function(a,b){
     var pa = semAcento(LIVROS[a][N]).indexOf(partes[0]),
@@ -404,6 +497,90 @@ elLista.addEventListener('click', function(ev){
   mostrarLivro(LIVROS[+b.dataset.i]);
 });
 
+/* ---------- chips de modo ---------- */
+function pintarChips(){
+  elChipFeira.setAttribute('aria-pressed', soFeira?'true':'false');
+  elChipBalcao.setAttribute('aria-pressed', balcao?'true':'false');
+  elCarrinho.hidden = !(balcao || carrinho.length);
+}
+elChipFeira.addEventListener('click', function(){
+  soFeira=!soFeira; guardar('soFeira', soFeira?'1':'0'); pintarChips();
+  if(elQ.value.trim()) rodarBusca();
+});
+elChipBalcao.addEventListener('click', function(){
+  balcao=!balcao; guardar('balcao', balcao?'1':'0'); pintarChips();
+});
+
+/* ---------- carrinho do balcão ---------- */
+var carrinho = [];
+try{
+  var salvo = lembrar('carrinho');
+  if(salvo) carrinho = JSON.parse(salvo) || [];
+}catch(e){ carrinho = []; }
+
+function somaCarrinho(){
+  var t=0;
+  for(var i=0;i<carrinho.length;i++) t += carrinho[i].preco*carrinho[i].qtd;
+  return Math.round(t*100)/100;
+}
+function salvarCarrinho(){
+  try{ guardar('carrinho', JSON.stringify(carrinho)); }catch(e){}
+}
+function adicionarCarrinho(livro){
+  var achou=null;
+  for(var i=0;i<carrinho.length;i++){ if(carrinho[i].c===livro[C]){ achou=carrinho[i]; break; } }
+  if(achou) achou.qtd++;
+  else carrinho.push({c:livro[C], n:livro[N], preco:livro[P], qtd:1});
+  salvarCarrinho(); pintarCarrinho();
+}
+function mudarQtd(codigo, delta){
+  for(var i=0;i<carrinho.length;i++){
+    if(carrinho[i].c!==codigo) continue;
+    carrinho[i].qtd += delta;
+    if(carrinho[i].qtd<=0) carrinho.splice(i,1);
+    break;
+  }
+  salvarCarrinho(); pintarCarrinho();
+}
+function pintarCarrinho(){
+  elCarrinho.hidden = !(balcao || carrinho.length);
+  var total = somaCarrinho();
+  elSomaTotal.textContent = 'R$ '+moeda(total);
+  elTiraTotal.textContent = 'R$ '+moeda(total);
+  if(!carrinho.length){
+    elItensCarrinho.innerHTML =
+      '<li><div class="aviso" style="padding:10px 2px">Bipe os livros com a câmera aberta e eles entram aqui.</div></li>';
+  }else{
+    elItensCarrinho.innerHTML = carrinho.map(function(it){
+      return '<li><button data-c="'+esc(it.c)+'" data-d="1">'+
+        '<span class="t">'+esc(it.n)+'<small>'+it.qtd+' × R$ '+moeda(it.preco)+
+        ' · toque para tirar 1</small></span>'+
+        '<span class="p">R$ '+moeda(Math.round(it.preco*it.qtd*100)/100)+'</span>'+
+        '</button></li>';
+    }).join('');
+  }
+  calcularTroco();
+}
+elItensCarrinho.addEventListener('click', function(ev){
+  var b = ev.target.closest('button[data-c]');
+  if(!b) return;
+  mudarQtd(b.dataset.c, -1);
+});
+document.getElementById('btnLimparCarrinho').addEventListener('click', function(){
+  if(carrinho.length && !confirm('Limpar o balcão?')) return;
+  carrinho=[]; salvarCarrinho(); elRecebido.value=''; pintarCarrinho();
+});
+function calcularTroco(){
+  var bruto = (elRecebido.value||'').replace(/[^0-9,.]/g,'').replace(/\./g,'').replace(',','.');
+  var recebido = parseFloat(bruto);
+  var total = somaCarrinho();
+  if(!recebido || !total){ elTroco.textContent='—'; elTroco.className=''; return; }
+  var dif = Math.round((recebido-total)*100)/100;
+  if(dif<0){ elTroco.textContent='Faltam R$ '+moeda(-dif); elTroco.className='falta'; }
+  else{ elTroco.textContent='Troco R$ '+moeda(dif); elTroco.className='ok'; }
+}
+elRecebido.addEventListener('input', calcularTroco);
+
 /* ---------- recentes ---------- */
 var recentes=[];
 function registrarRecente(livro){
@@ -444,12 +621,16 @@ function rodarBusca(){
     return;
   }
   var ids = buscarTexto(termo);
+  var extra = '';
+  if(ocultos) extra = ocultos+(ocultos===1?' título encontrado está':' títulos encontrados estão')+
+    ' só na loja. Desligue o filtro “Só o que está na feira” para ver.';
   if(!ids.length){
-    renderLista([], 'Resultados', 'Nenhum título com “'+termo+'”. Tente uma palavra só, sem acento.');
+    renderLista([], 'Resultados',
+      extra || 'Nenhum título com “'+termo+'”. Tente uma palavra só, sem acento.');
     return;
   }
   renderLista(ids, ids.length+(ids.length===1?' título':' títulos'),
-    ids.length>40 ? 'Mostrando os 40 primeiros. Digite mais uma palavra para afinar.' : '');
+    (ids.length>40 ? 'Mostrando os 40 primeiros. Digite mais uma palavra para afinar. ' : '')+extra);
 }
 elLimpar.addEventListener('click', function(){
   elQ.value=''; elLimpar.hidden=true; elAreaLista.hidden=true; elQ.focus();
@@ -501,6 +682,8 @@ function carregarScript(urls){
 
 async function abrirCamera(){
   elCamera.hidden=false; elFalha.hidden=true;
+  elTira.hidden = !balcao;
+  if(balcao) elTiraItem.innerHTML = 'Bipe o primeiro livro';
   elDica.textContent='Encaixe o código de barras na janela';
   try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
@@ -638,10 +821,24 @@ function prepararZoom(){
 
 function receberCodigo(texto){
   var agora = Date.now();
-  if(texto===ultimo && agora-ultimoT<1500) return;
+  if(texto===ultimo && agora-ultimoT<1800) return;
   ultimo=texto; ultimoT=agora;
   var livro = buscarCodigo(texto);
   bip(!!livro);
+
+  if(balcao){
+    if(livro){
+      adicionarCarrinho(livro);
+      elTiraItem.innerHTML = esc(livro[N])+' <b>R$ '+moeda(livro[P])+'</b>';
+    }else{
+      elTiraItem.innerHTML = '<b style="color:var(--erro)">Código fora da listagem</b> '+
+        esc(String(texto).replace(/\D/g,'') || texto);
+    }
+    elTira.hidden=false;
+    elDica.textContent='Pode bipar o próximo';
+    return;
+  }
+
   fecharCamera();
   if(livro) mostrarLivro(livro);
   else mostrarNaoEncontrado(String(texto).replace(/\D/g,'') || texto);
@@ -699,7 +896,7 @@ function fecharCamera(){
   }catch(e){}
   stream=null; elVideo.srcObject=null;
   elLanterna.hidden=true; elLanterna.setAttribute('aria-pressed','false');
-  elZoom.hidden=true;
+  elZoom.hidden=true; elTira.hidden=true;
   elCamera.hidden=true;
 }
 
@@ -708,6 +905,8 @@ document.addEventListener('visibilitychange', function(){
   if(document.hidden && !elCamera.hidden) fecharCamera();
 });
 
+pintarChips();
+pintarCarrinho();
 mostrarInicio();
 })();
 </script>
