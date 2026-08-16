@@ -76,6 +76,15 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 }
 .chip[aria-pressed="true"]{background:var(--marca);color:#000000;border-color:var(--marca);font-weight:600}
 
+.chips.faixas{align-items:center;margin-top:-8px;margin-bottom:16px}
+.rotulo-faixa{font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--texto-fraco);margin-right:2px}
+.mini-chip{padding:7px 13px;font-size:13px}
+.ver-mais{
+  width:100%;margin-top:12px;background:none;color:var(--marca);
+  border:1px solid rgba(57,255,20,.4);border-radius:12px;padding:12px;
+  font-family:var(--corpo);font-size:14px;cursor:pointer;
+}
 .carrinho{
   background:var(--tinta-2);border:1px solid rgba(57,255,20,.34);
   border-radius:20px;padding:14px 16px 16px;margin-bottom:16px;
@@ -248,8 +257,10 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
 .rodape{
   max-width:620px;margin:26px auto 0;padding:16px 18px 24px;
   border-top:1px solid rgba(255,255,255,.13);
-  font-size:12.5px;color:var(--texto-fraco);line-height:1.6;font-family:var(--mono);
+  font-size:12.5px;color:var(--texto-fraco);line-height:1.7;font-family:var(--mono);
+  text-align:center;letter-spacing:.04em;
 }
+.rodape .assinatura{color:var(--texto);letter-spacing:.1em}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -273,6 +284,14 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
     <button class="chip" id="chipFeira" aria-pressed="true">Só o que está na feira</button>
     <button class="chip" id="chipBalcao" aria-pressed="false">Modo balcão</button>
   </div>
+  <div class="chips faixas">
+    <span class="rotulo-faixa">Até</span>
+    <button class="chip mini-chip" data-faixa="10" aria-pressed="false">R$ 10</button>
+    <button class="chip mini-chip" data-faixa="20" aria-pressed="false">R$ 20</button>
+    <button class="chip mini-chip" data-faixa="30" aria-pressed="false">R$ 30</button>
+    <button class="chip mini-chip" data-faixa="50" aria-pressed="false">R$ 50</button>
+    <button class="chip mini-chip" data-faixa="50+" aria-pressed="false">+ de 50</button>
+  </div>
 
   <section class="carrinho" id="carrinho" hidden>
     <div class="carrinho-topo">
@@ -295,6 +314,7 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   <div id="area-lista" hidden>
     <div class="secao-rotulo" id="rotulo-lista">Resultados</div>
     <ul class="itens" id="lista"></ul>
+    <button class="ver-mais" id="verMais" hidden>Ver mais 40</button>
     <p class="aviso" id="aviso-lista" hidden></p>
   </div>
 
@@ -304,8 +324,8 @@ main{padding:18px 18px 0;max-width:620px;margin:0 auto}
   </div>
 
   <div class="rodape">
-    <span id="total"></span><br>
-    Listagem de venda 12/08/2026 · romaneio ARA LITERARIA 2026
+    <span class="assinatura">Powered by Rafael Chagas</span><br>
+    Versão 1.0 · 15/08/2026
   </div>
 </main>
 
@@ -370,13 +390,8 @@ var elQ=document.getElementById('q'), elLimpar=document.getElementById('limpar')
     elCarrinho=document.getElementById('carrinho'), elItensCarrinho=document.getElementById('itensCarrinho'),
     elSomaTotal=document.getElementById('somaTotal'), elRecebido=document.getElementById('recebido'),
     elTroco=document.getElementById('trocoValor'), elTira=document.getElementById('tira'),
-    elTiraItem=document.getElementById('tiraItem'), elTiraTotal=document.getElementById('tiraTotal');
-
-var naFeira = 0;
-for(var k=0;k<LIVROS.length;k++){ if(LIVROS[k][Q]>0) naFeira++; }
-document.getElementById('total').textContent =
-  naFeira.toLocaleString('pt-BR') + ' títulos na feira · ' +
-  LIVROS.length.toLocaleString('pt-BR') + ' na listagem';
+    elTiraItem=document.getElementById('tiraItem'), elTiraTotal=document.getElementById('tiraTotal'),
+    elVerMais=document.getElementById('verMais');
 
 /* ---------- preferências simples ---------- */
 function guardar(chave,valor){ try{ localStorage.setItem(chave,valor); }catch(e){} }
@@ -384,6 +399,9 @@ function lembrar(chave){ try{ return localStorage.getItem(chave); }catch(e){ ret
 
 var soFeira = lembrar('soFeira') !== '0';
 var balcao  = lembrar('balcao') === '1';
+var faixa   = null;      // {teto:n} ou {piso:n}, ou null
+var mostrar = 40;        // quantos resultados a lista exibe
+var ultimosIds = [];
 
 /* ---------- formatação ---------- */
 function moeda(v){
@@ -414,17 +432,29 @@ function buscarCodigo(bruto){
 var ocultos = 0;
 function buscarTexto(termo){
   var alvo = semAcento(termo).trim();
-  if(alvo.length<2) return [];
-  var partes = alvo.split(/\s+/), achados=[];
+  var partes = alvo ? alvo.split(/\s+/) : [];
+  if(!partes.length && !faixa) return [];
+  if(alvo && alvo.length<2 && !faixa) return [];
+  var achados=[];
   ocultos = 0;
-  for(var i=0;i<indice.length && achados.length<400;i++){
-    var txt=indice[i], ok=true;
-    for(var j=0;j<partes.length;j++){ if(txt.indexOf(partes[j])===-1){ok=false;break;} }
-    if(!ok) continue;
+  for(var i=0;i<indice.length;i++){
+    if(partes.length){
+      var txt=indice[i], ok=true;
+      for(var j=0;j<partes.length;j++){ if(txt.indexOf(partes[j])===-1){ok=false;break;} }
+      if(!ok) continue;
+    }
+    if(faixa){
+      if(faixa.teto!==undefined && LIVROS[i][P] > faixa.teto) continue;
+      if(faixa.piso!==undefined && LIVROS[i][P] <= faixa.piso) continue;
+    }
     if(soFeira && LIVROS[i][Q]<=0){ ocultos++; continue; }
     achados.push(i);
   }
   achados.sort(function(a,b){
+    if(faixa){
+      if(LIVROS[b][P]!==LIVROS[a][P]) return LIVROS[b][P]-LIVROS[a][P];
+      return LIVROS[a][N].localeCompare(LIVROS[b][N],'pt-BR');
+    }
     var pa = semAcento(LIVROS[a][N]).indexOf(partes[0]),
         pb = semAcento(LIVROS[b][N]).indexOf(partes[0]);
     if(pa<0)pa=999; if(pb<0)pb=999;
@@ -479,8 +509,11 @@ function mostrarInicio(){
 }
 
 function renderLista(ids, rotulo, aviso){
+  ultimosIds = ids;
   elRotuloLista.textContent = rotulo;
-  elLista.innerHTML = ids.slice(0,40).map(function(i){
+  elVerMais.hidden = ids.length <= mostrar;
+  elVerMais.textContent = 'Ver mais ' + Math.min(40, ids.length-mostrar) + ' de ' + ids.length;
+  elLista.innerHTML = ids.slice(0,mostrar).map(function(i){
     var l=LIVROS[i];
     return '<li><button data-i="'+i+'">'+
       '<span class="t">'+esc(l[N])+'<small>'+esc(l[C])+(l[Q]>0?' · '+l[Q]+' na feira':' · não enviado')+'</small></span>'+
@@ -490,6 +523,11 @@ function renderLista(ids, rotulo, aviso){
   if(aviso){ elAvisoLista.textContent=aviso; elAvisoLista.hidden=false; }
   else elAvisoLista.hidden=true;
 }
+
+elVerMais.addEventListener('click', function(){
+  mostrar += 40;
+  renderLista(ultimosIds, elRotuloLista.textContent, elAvisoLista.hidden?'':elAvisoLista.textContent);
+});
 
 elLista.addEventListener('click', function(ev){
   var b = ev.target.closest('button[data-i]');
@@ -505,8 +543,28 @@ function pintarChips(){
 }
 elChipFeira.addEventListener('click', function(){
   soFeira=!soFeira; guardar('soFeira', soFeira?'1':'0'); pintarChips();
-  if(elQ.value.trim()) rodarBusca();
+  if(elQ.value.trim() || faixa) rodarBusca();
 });
+var elFaixas = document.querySelectorAll('[data-faixa]');
+for(var fi=0; fi<elFaixas.length; fi++){
+  elFaixas[fi].addEventListener('click', function(){
+    var chave = this.dataset.faixa;
+    var ligada = faixa && faixa.chave===chave;
+    if(ligada){
+      faixa = null;
+    }else if(chave.slice(-1)==='+'){
+      faixa = {chave:chave, piso:parseFloat(chave)};
+    }else{
+      faixa = {chave:chave, teto:parseFloat(chave)};
+    }
+    for(var k=0;k<elFaixas.length;k++){
+      elFaixas[k].setAttribute('aria-pressed',
+        (faixa && elFaixas[k].dataset.faixa===faixa.chave) ? 'true':'false');
+    }
+    rodarBusca();
+  });
+}
+
 elChipBalcao.addEventListener('click', function(){
   balcao=!balcao; guardar('balcao', balcao?'1':'0'); pintarChips();
 });
@@ -609,9 +667,14 @@ elQ.addEventListener('input', function(){
   clearTimeout(timer);
   timer = setTimeout(rodarBusca, 130);
 });
-function rodarBusca(){
+function rodarBusca(reinicia){
+  if(reinicia!==false) mostrar = 40;
   var termo = elQ.value.trim();
-  if(!termo){ elAreaLista.hidden=true; return; }
+  if(!termo && !faixa){
+    elAreaLista.hidden=true; elVerMais.hidden=true;
+    if(!elResultado.innerHTML) mostrarInicio();
+    return;
+  }
   var digitos = termo.replace(/\D/g,'');
   if(digitos.length>=7 && digitos.length===termo.replace(/\s/g,'').length){
     var l = buscarCodigo(digitos);
@@ -622,15 +685,20 @@ function rodarBusca(){
   }
   var ids = buscarTexto(termo);
   var extra = '';
+  var plural = ids.length===1 ? ' título' : ' títulos';
+  var titulo = ids.length+plural;
+  if(faixa && faixa.teto!==undefined) titulo = ids.length+plural+' até R$ '+faixa.teto;
+  if(faixa && faixa.piso!==undefined) titulo = ids.length+plural+' acima de R$ '+faixa.piso;
   if(ocultos) extra = ocultos+(ocultos===1?' título encontrado está':' títulos encontrados estão')+
     ' só na loja. Desligue o filtro “Só o que está na feira” para ver.';
   if(!ids.length){
     renderLista([], 'Resultados',
-      extra || 'Nenhum título com “'+termo+'”. Tente uma palavra só, sem acento.');
+      extra || (termo ? 'Nenhum título com “'+termo+'”. Tente uma palavra só, sem acento.'
+                      : 'Nenhum título nessa faixa de preço.'));
     return;
   }
-  renderLista(ids, ids.length+(ids.length===1?' título':' títulos'),
-    (ids.length>40 ? 'Mostrando os 40 primeiros. Digite mais uma palavra para afinar. ' : '')+extra);
+  if(elResultado.querySelector('.cartao.vazio')) elResultado.innerHTML='';
+  renderLista(ids, titulo, extra);
 }
 elLimpar.addEventListener('click', function(){
   elQ.value=''; elLimpar.hidden=true; elAreaLista.hidden=true; elQ.focus();
